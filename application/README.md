@@ -2,9 +2,13 @@
 
 This application provides a demo for integrating Vipps payment through the use of the REST API service module 'vipps-client-web'.
 
-The 'vipps-client-web' module wraps necessary Vipps (ecom) API calls to provide for initiating online transactions using Vipps;
+The ['vipps-client-web'](../library/README.md) module wraps necessary Vipps (ecom) API calls to provide for initiating online transactions using Vipps;
 handling order confirmation or cancellation callbacks and other endpoints required to integrate this third party service.
-See the README for further details on the 'vipps-client-web' module!
+
+See the [README](../library/README.md) for further details on the 'vipps-client-web' module!
+
+    There are further requirements for a working integration between the 'vipps-client-web' module and the Vipps service.
+    You can find more information on these requirements in the previously mentioned README.
 
 ## Demo Content
 
