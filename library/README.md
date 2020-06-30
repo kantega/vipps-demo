@@ -75,10 +75,8 @@ providing shipping details (express checkout only), and removing user's consent 
 Vipps endpoint URI paths are all mapped at ```/vipps/v2```
 
     NOTE! The Vipps documentation specifies that Vipps will append e.g. '/v2/payments/**' to your base callback url,
-    indicating that the natural base callback url should be '<your site>/vipps', but this is not what I've experienced.
-    Callbacks are successfully handled at base url '<your site>', with current appended URI paths (i.e. /vipps/v2/**).
-    
-    This may change...
+    indicating that the natural base callback url would be '<your site>/vipps', however because we will append '/vipps'
+    to your provided base url, the correct base url should be '<your site>'.
 
 ## Limitations
 
