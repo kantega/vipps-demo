@@ -23,3 +23,12 @@ Fetch your connection string by running
 ```
 $ heroku config:get MONGODB_URI
 ```
+
+Because we have a multi-module component in our repository, we need to specify the location of the application for Heroku.
+The project's Procfile specifies the destination where Heroku should find the it.
+
+We will provide Heroku with the environment variable to hold the application path.
+
+```
+$ heroku config:set PATH_TO_JAR=application/target/<application jar>
+```
