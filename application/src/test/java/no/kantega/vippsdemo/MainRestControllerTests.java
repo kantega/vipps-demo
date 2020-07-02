@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Optional;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -81,5 +83,24 @@ public class MainRestControllerTests {
 
         this.mockMvc.perform(get("/product?name=Product")).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().string(containsString("")));
+    }
+
+    @Test void completeOrderSuccess() throws Exception {
+        String orderId = "abc123";
+        String status = "complete";
+        Order order = mock(Order.class);
+
+        when(orderService.getOrderById(orderId)).thenReturn(Optional.of(order));
+        when(order.getStatus()).thenReturn(status);
+
+        this.mockMvc.perform(get("/complete/"+ orderId)).andDo(print()).andExpect(status().isOk())
+                .andExpect(content().string(containsString(status)));
+    }
+
+    @Test void completeOrderNotFound() throws Exception {
+        String orderId = "abc123";
+        when(orderService.getOrderById(orderId)).thenReturn(Optional.empty());
+
+        this.mockMvc.perform(get("/complete/"+ orderId)).andDo(print()).andExpect(status().isNotFound());
     }
 }
