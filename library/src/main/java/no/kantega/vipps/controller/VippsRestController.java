@@ -2,6 +2,7 @@ package no.kantega.vipps.controller;
 
 import no.kantega.vipps.IPaymentStatusListener;
 import no.kantega.vipps.dto.PaymentCallbackInfoDTO;
+import no.kantega.vipps.dto.ShippingRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,12 @@ public class VippsRestController {
         registerPaymentStatusListener(paymentStatusListener);
     }
 
+    /**
+     * Provides a callback endpoint for Vipps
+     * @param order_id Identifies the order triggering the callback.
+     * @param paymentRequest Holds information on the payment request that triggered the callback.
+     * @param headers Holds header information - such as auth token
+     */
     @PostMapping("/payments/{order_id}")
     public void callback(@PathVariable String order_id, @RequestBody PaymentCallbackInfoDTO paymentRequest,
                          @RequestHeader Map<String, String> headers) {
@@ -53,6 +60,16 @@ public class VippsRestController {
                 // invoke the callback method of class A
                 paymentStatusListener.setPaymentStatus(order_id, paymentRequest, headers.get("Authorization"));
         }).start();
+    }
+
+    /**
+     * Provides an endpoint to extract shipping details for an order.
+     * @param order_id Identifies the order to retrieve shipping details on.
+     * @param shippingRequest
+     */
+    @PostMapping("/payments/{order_id}/shippingDetails")
+    public ResponseEntity<String> shippingDetails(@PathVariable String order_id, @RequestBody ShippingRequestDTO shippingRequest) {
+        return ResponseEntity.ok().build();
     }
 
     /**
