@@ -85,16 +85,14 @@ public class MainRestControllerTests {
                 .andExpect(content().string(containsString("")));
     }
 
-    @Test void completeOrderSuccess() throws Exception {
+    @Test void completeOrderSale() throws Exception {
         String orderId = "abc123";
-        String status = "complete";
         Order order = mock(Order.class);
 
         when(orderService.getOrderById(orderId)).thenReturn(Optional.of(order));
-        when(order.getStatus()).thenReturn(status);
+        when(order.getStatus()).thenReturn("SALE");
 
-        this.mockMvc.perform(get("/complete/"+ orderId)).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString(status)));
+        this.mockMvc.perform(get("/complete/"+ orderId)).andDo(print()).andExpect(status().isOk());
     }
 
     @Test void completeOrderNotFound() throws Exception {
