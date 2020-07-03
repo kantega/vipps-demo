@@ -4,8 +4,10 @@ import no.kantega.vipps.IPaymentStatusListener;
 import no.kantega.vipps.dto.PaymentCallbackInfoDTO;
 import no.kantega.vipps.dto.ShippingRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -43,6 +45,7 @@ public class VippsRestController {
      * @param order_id Identifies the order triggering the callback.
      * @param paymentRequest Holds information on the payment request that triggered the callback.
      * @param headers Holds header information - such as auth token
+     * @throws ResponseStatusException
      */
     @PostMapping("/payments/{order_id}")
     public void callback(@PathVariable String order_id, @RequestBody PaymentCallbackInfoDTO paymentRequest,
@@ -53,13 +56,23 @@ public class VippsRestController {
         // Check if we have a registered listener and forward the message.
         if (paymentStatusListener == null) {
             logger.severe("Cannot process payment update! No payment listener registered.");
-            return;
         }
 
-        new Thread(() -> {
-                // invoke the callback method of class A
+        Thread.UncaughtExceptionHandler exceptionHandler = (t, exc)
+                -> logger.severe("Caught exception: " + exc.getMessage());
+
+        Thread t = new Thread(() -> {
+            // Invoke the callback method of the payment status listener
+            try {
                 paymentStatusListener.setPaymentStatus(order_id, paymentRequest, headers.get("Authorization"));
-        }).start();
+            }
+            catch (IllegalArgumentException e) {
+                throw e;
+            }
+        });
+
+        t.setUncaughtExceptionHandler(exceptionHandler);
+        t.start();
     }
 
     /**
@@ -69,7 +82,13 @@ public class VippsRestController {
      */
     @PostMapping("/payments/{order_id}/shippingDetails")
     public ResponseEntity<String> shippingDetails(@PathVariable String order_id, @RequestBody ShippingRequestDTO shippingRequest) {
-        return ResponseEntity.ok().build();
+        // Call your order service to check for order shipping details here
+        // ...
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     /**
@@ -81,6 +100,12 @@ public class VippsRestController {
      */
     @DeleteMapping("/consents/{user_id}")
     public ResponseEntity<String> removeConsents(@PathVariable String user_id) {
-        return ResponseEntity.ok().build();
+        // Call your consent service to remove consent for the specified user here
+        // ...
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .build();
     }
 }

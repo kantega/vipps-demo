@@ -1,9 +1,12 @@
 package no.kantega.vipps;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import no.kantega.vipps.controller.VippsRestController;
@@ -13,11 +16,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 
 public class VippsRestControllerTests {
 
-    private final IPaymentStatusListener paymentStatusListener = mock(IPaymentStatusListener.class);;
+    private final IPaymentStatusListener paymentStatusListener = mock(IPaymentStatusListener.class);
     private VippsRestController restController;
 
     private MockMvc mockMvc;
@@ -71,5 +75,15 @@ public class VippsRestControllerTests {
     public void shouldProcessConsents() throws Exception {
         this.mockMvc.perform(delete("/vipps/v2/consents/user123abc"))
                 .andDo(print()).andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnShippingDetails() throws Exception {
+        this.mockMvc.perform(post("/vipps/v2/payments/123abc/shippingDetails")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 }
