@@ -8,6 +8,8 @@ import no.kantega.vippsdemo.dto.PaymentRequestDTO;
 import no.kantega.vippsdemo.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -63,16 +65,6 @@ public class MainRestController {
         return orderService.getAllOrders();
     }
 
-    /**
-     * This endpoint will return an order, based on the input order id.
-     * TODO! Consider uniting/reusing this for payment completion (see the completeOrder() method)
-     */
-    @GetMapping("/order/{order_id}")
-    public Optional<Order> getOrderById(@PathVariable String order_id) {
-        logger.info("Retrieving order " + order_id);
-        return orderService.getOrderById(order_id);
-    }
-
     // @PostMapping(value = "/order", consumes = "application/json", produces = "application/json")
     @PostMapping("/order")
     public String createOrder(@RequestBody Order order) {
@@ -100,9 +92,9 @@ public class MainRestController {
      * @return Html formatted string containing current order status,
      * or 404 response status exception if not found.
      */
-    @GetMapping("/complete/{order_id}")
-    public String completeOrder(@PathVariable String order_id) {
-        logger.info("Completing order for " + order_id);
+    @GetMapping("/order/{order_id}")
+    public ResponseEntity<String> orderStatus(@PathVariable String order_id) {
+        logger.info("Retrieving order status for " + order_id);
         Optional<Order> order = orderService.getOrderById(order_id);
 
         if (!order.isPresent()) {
@@ -111,15 +103,27 @@ public class MainRestController {
             );
         }
 
-        String message = "Your order is being processed...";
+        // Default message
+        String message = String.format("Order %s is being processed...", order_id);
+        String order_status = order.get().getStatus();
 
-        if (order.get().getStatus().equals("SALE")) {
-            message = "Your payment has been registered.";
+        if (order_status.equals("SALE")) {
+            message = String.format("Order %s was successfully completed.", order_id);
+        }
+        else if (order_status.equals("CANCELLED")) {
+            message = String.format("Order %s was cancelled.", order_id);
+        }
+        else if (order_status.equals("REJECTED")) {
+            message = String.format("Order %s was rejected.", order_id);
+        }
+        else {
+            // Do nothing
         }
 
-        return ("<center>\n" +
+        return new ResponseEntity<>("<center>\n" +
                 String.format("<h1>%s</h1>\n\n", message) +
                 "<a href=\"/\">Return</a>\n" +
-                "</center>");
+                "</center>",
+                HttpStatus.OK);
     }
 }

@@ -92,13 +92,27 @@ public class MainRestControllerTests {
         when(orderService.getOrderById(orderId)).thenReturn(Optional.of(order));
         when(order.getStatus()).thenReturn("SALE");
 
-        this.mockMvc.perform(get("/complete/"+ orderId)).andDo(print()).andExpect(status().isOk());
+        this.mockMvc.perform(get("/order/"+ orderId)).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("completed")));
+    }
+
+    @Test void completeOrderRejected() throws Exception {
+        String orderId = "abc123";
+        Order order = mock(Order.class);
+
+        when(orderService.getOrderById(orderId)).thenReturn(Optional.of(order));
+        when(order.getStatus()).thenReturn("REJECTED");
+
+        this.mockMvc.perform(get("/order/"+ orderId)).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("rejected")));
     }
 
     @Test void completeOrderNotFound() throws Exception {
         String orderId = "abc123";
         when(orderService.getOrderById(orderId)).thenReturn(Optional.empty());
 
-        this.mockMvc.perform(get("/complete/"+ orderId)).andDo(print()).andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/order/"+ orderId)).andDo(print()).andExpect(status().isNotFound());
     }
 }
