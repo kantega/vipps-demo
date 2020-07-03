@@ -1,5 +1,6 @@
 package no.kantega.vipps.controller;
 
+import no.kantega.vipps.IConsentStatusListener;
 import no.kantega.vipps.IPaymentStatusListener;
 import no.kantega.vipps.dto.PaymentCallbackInfoDTO;
 import no.kantega.vipps.dto.ShippingRequestDTO;
@@ -24,6 +25,7 @@ public class VippsRestController {
 
     // Holds a listener object for payment status callbacks
     private IPaymentStatusListener paymentStatusListener;
+    private IConsentStatusListener consentStatusListener;
 
     Logger logger = Logger.getLogger(VippsRestController.class.getName());
 
@@ -35,9 +37,18 @@ public class VippsRestController {
         this.paymentStatusListener = listener;
     }
 
+    /**
+     * Call this method to register a listener for consent status updates
+     * @param listener Listener to register
+     */
+    public void registerConsentStatusListener(IConsentStatusListener listener) {
+        this.consentStatusListener = listener;
+    }
+
     @Autowired
-    public VippsRestController(IPaymentStatusListener paymentStatusListener) {
+    public VippsRestController(IPaymentStatusListener paymentStatusListener, IConsentStatusListener consentStatusListener) {
         registerPaymentStatusListener(paymentStatusListener);
+        registerConsentStatusListener(consentStatusListener);
     }
 
     /**
@@ -96,13 +107,34 @@ public class VippsRestController {
      * It is only used for express checkouts and should not be implemented otherwise.
      * @param user_id Path parameter, identifying the user which consent is being withdrawn.
      * @return 200
-     * TODO! Implement a consent listener integration
      */
     @DeleteMapping("/consents/{user_id}")
     public ResponseEntity<String> removeConsents(@PathVariable String user_id) {
-        // Call your consent service to remove consent for the specified user here
-        // ...
+        logger.info("Received consent status update on user: " + user_id);
 
+        // Check if we have a registered listener and forward the message.
+        if (consentStatusListener == null) {
+            logger.severe("Cannot process consent update! No consent listener registered.");
+        }
+
+        Thread.UncaughtExceptionHandler exceptionHandler = (t, exc)
+                -> logger.severe("Caught exception: " + exc.getMessage());
+
+        Thread t = new Thread(() -> {
+            // Invoke the callback method of the payment status listener
+            try {
+                // Remove the user's consent
+                consentStatusListener.setConsentStatus(user_id, null, false);
+            }
+            catch (IllegalArgumentException e) {
+                throw e;
+            }
+        });
+
+        t.setUncaughtExceptionHandler(exceptionHandler);
+        t.start();
+
+        // Vipps doesn't care about a response, so this is more a formality
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)

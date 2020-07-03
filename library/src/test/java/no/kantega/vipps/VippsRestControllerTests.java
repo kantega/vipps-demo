@@ -16,19 +16,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.server.ResponseStatusException;
 
 
 public class VippsRestControllerTests {
 
     private final IPaymentStatusListener paymentStatusListener = mock(IPaymentStatusListener.class);
+    private final IConsentStatusListener consentStatusListener = mock(IConsentStatusListener.class);
     private VippsRestController restController;
 
     private MockMvc mockMvc;
 
     public VippsRestControllerTests() {
 
-        restController = new VippsRestController(paymentStatusListener);
+        restController = new VippsRestController(paymentStatusListener, consentStatusListener);
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(restController)
