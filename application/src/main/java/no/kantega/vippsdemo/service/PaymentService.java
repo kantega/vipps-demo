@@ -38,9 +38,10 @@ public class PaymentService {
      * The payment request is populated with missing information as the transaction is being processed.
      * @param paymentRequest Contains payment information to be used for creating the order/payment transaction.
      * @return An order id for the payment request.
+     * @throws IllegalArgumentException if input arguments fail.
      */
     @Transactional
-    public String initCreatePayment(PaymentRequestDTO paymentRequest) {
+    public String initCreatePayment(PaymentRequestDTO paymentRequest) throws IllegalArgumentException {
         logger.info("Creating payment...");
 
         // Iterate the products requested to purchase and calculate the price to pay
@@ -49,17 +50,18 @@ public class PaymentService {
 
             logger.info("Fetching product details for '" + requestProduct.getName() + "'...");
             Product product = productService.getProductByName(requestProduct.getName());
-            if (product != null) {
-                totalAmount += product.getPrice() * requestProduct.getQuantity();
-            }
-            else {
+            if (product == null) {
                 logger.log(Level.SEVERE, "Could not find the product!");
+                throw new IllegalArgumentException("product is no longer available");
             }
+
+            totalAmount += product.getPrice() * requestProduct.getQuantity();
         }
 
+        // TODO! Put this logic in the service module
         if (totalAmount < 100) {
             logger.log(Level.WARNING, "The total is below minimum value! The order will not be processed!");
-            return "";
+            throw new IllegalArgumentException("product total is below minimum charge");
         }
 
         // Create a new order and retrieve its order id

@@ -55,7 +55,7 @@ public class MainRestControllerTests {
         // Create a header which will be checked for authenticity
         HttpHeaders httpHeaders = mock(HttpHeaders.class);
 
-        when(paymentService.initCreatePayment(any())).thenReturn("{}");
+        when(paymentService.initCreatePayment(any())).thenReturn("some order id");
 
         this.mockMvc.perform(post("/initiatePayment")
                 .headers(httpHeaders)
@@ -74,6 +74,20 @@ public class MainRestControllerTests {
         // Expect a call to the service method for creating payment
         verify(paymentService, times(1))
                 .initCreatePayment(any());
+    }
+
+    @Test
+    public void failedPaymentThrows() throws Exception {
+        HttpHeaders httpHeaders = mock(HttpHeaders.class);
+
+        doThrow(IllegalArgumentException.class).when(paymentService).initCreatePayment(any());
+
+        this.mockMvc.perform(post("/initiatePayment")
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andDo(print())
+                .andExpect(status().is5xxServerError());
     }
 
     @Test

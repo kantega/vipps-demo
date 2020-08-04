@@ -79,9 +79,18 @@ public class MainRestController {
      * @return An order id for the processed payment.
      */
     @PostMapping("/initiatePayment")
-    public String initiatePayment(@RequestBody PaymentRequestDTO paymentRequest){
+    public ResponseEntity<String> initiatePayment(@RequestBody PaymentRequestDTO paymentRequest){
         logger.info("Initiating payment request...");
-        return paymentService.initCreatePayment(paymentRequest);
+
+        String order_id;
+        try {
+            order_id = paymentService.initCreatePayment(paymentRequest);
+        }
+        catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+
+        return new ResponseEntity<>(order_id, HttpStatus.OK);
     }
 
     /**
