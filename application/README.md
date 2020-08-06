@@ -101,6 +101,10 @@ Expected notation value is `mongodb://<user>:<password>@<host>:<port>/<database>
     Note that a production copy of your code shall not contain any secrets - including the DB username and password!
     It is highly recommended you keep your secrets well protected and out of reach for the public.
 
+An undefined connection string indicates the use of localhost as DB provider.
+
+For unit testing, we use in-memory instances.  
+
 ### The application landing page
 
 This application hosts a very simple landing page, which will (provided you have configured and populated a product database)
