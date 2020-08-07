@@ -24,8 +24,13 @@ Fetch your connection string by running
 $ heroku config:get MONGODB_URI
 ```
 
+    Note! Heroku will discontinue its support of MongoDB (mLab) on November 10, 2020.
+    If you wish to continue using NoSQL as your data repository, you may find that Atlas (https://www.mongodb.com/cloud/atlas)
+    provides a free tier solution.
+    Once you've set up a collection with Atlas, you may simply swap your mLab connection string with your Atlas one.
+
 Because we have a multi-module component in our repository, we need to specify the location of the application for Heroku.
-The project's Procfile specifies the destination where Heroku should find the it.
+The project's Procfile specifies the destination where Heroku should find it.
 
 We will provide Heroku with the environment variable to hold the application path.
 
