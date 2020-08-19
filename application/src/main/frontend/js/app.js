@@ -55,6 +55,14 @@ function Copyright() {
     );
 }
 
+function LoginButton() {
+    return (
+        <button>
+            <a href="/login/vipps">Log inn med Vipps</a>
+        </button>
+    )
+}
+
 export default function App() {
     const classes = useStyles();
 
@@ -73,6 +81,7 @@ export default function App() {
                     <ShoppingBasket userId={"123456"} msisdn={""}/>
                 </Paper>
                 <Copyright />
+                <LoginButton />
             </main>
         </React.Fragment>
     );

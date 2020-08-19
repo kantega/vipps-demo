@@ -24,5 +24,11 @@ module.exports = {
                 }]
             }
         ]
+    },
+    devServer: {
+        contentBase: path.join(__dirname, '../resources/templates'),
+        port: 3000,
+        publicPath: '/',
+        hot: true,
     }
 };

@@ -37,6 +37,6 @@ public class VippsLoginControllerTests {
                 .andExpect(content().string(containsString("ok")));
 
         verify(oauthService, times(1))
-                .createOauthSession(any());
+                .redirectToVipps(any(), any());
     }
 }

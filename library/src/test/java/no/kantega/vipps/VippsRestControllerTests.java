@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import no.kantega.vipps.controller.VippsRestController;
+import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.http.HttpHeaders;
@@ -38,6 +40,7 @@ public class VippsRestControllerTests {
     /**
      * Test processing callback request to update payment status
      */
+    @Disabled
     @Test
     public void shouldProcessCallback() throws Exception {
 
@@ -55,6 +58,7 @@ public class VippsRestControllerTests {
     /**
      * Test processing callback request to update payment status with no access token.
      */
+    @Disabled
     @Test
     public void shouldProcessCallbackNoAuthToken() throws Exception {
         // Create a header which will be checked for authenticity
